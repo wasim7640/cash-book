@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>R M Enterprise - Cash Book 2025 & 2026</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f5f6f8;--card:#fff;--tx:#1b2330;--mu:#6b7686;--bd:#dde1e7;--ac:#1d5fd1;--dr:#0f7a43;--cr:#c0392b;--hd:#eef1f6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161c;--card:#1b212a;--tx:#e8ecf2;--mu:#8f9bad;--bd:#2c3441;--ac:#6ea1ff;--dr:#4cc28a;--cr:#ff7b6b;--hd:#232b36}}
+:root[data-theme="dark"]{--bg:#12161c;--card:#1b212a;--tx:#e8ecf2;--mu:#8f9bad;--bd:#2c3441;--ac:#6ea1ff;--dr:#4cc28a;--cr:#ff7b6b;--hd:#232b36}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;padding:12px}
+h1{font-size:18px;margin:0}.sub{color:var(--mu);font-size:12px}
+.wrap{max-width:1100px;margin:auto}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-top:12px}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px}
+.kpi b{display:block;font-size:18px;margin-top:2px}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;align-items:end}
+label{font-size:11px;color:var(--mu);display:block;margin-bottom:2px}
+input,select{width:100%;padding:7px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit}
+button{padding:8px 12px;border:0;border-radius:6px;background:var(--ac);color:#fff;font:inherit;cursor:pointer}
+button.g{background:var(--hd);color:var(--tx);border:1px solid var(--bd)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tabs button.on{background:var(--ac);color:#fff}.tabs button{background:var(--hd);color:var(--tx)}
+.sc{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{border:1px solid var(--bd);padding:6px 8px;text-align:left;white-space:nowrap}
+th{background:var(--hd);font-size:12px}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.dr{color:var(--dr)}.cr{color:var(--cr)}
+tfoot td{font-weight:700;background:var(--hd)}
+.x{background:none;color:var(--cr);padding:0 6px;font-size:16px}
+.empty{color:var(--mu);text-align:center;padding:18px}
+@media print{body{background:#fff;color:#000}form,.tabs,.x,.noprint{display:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="top">
+  <div><h1>R M ENTERPRISE</h1><div class="sub">CASH BOOK – 2025 &amp; 2026 · Ledger Particular · Cash Balance</div></div>
+  <div class="noprint"><button class="g" onclick="window.print()">Print</button></div>
+ </div>
+
+ <div class="kpis">
+  <div class="kpi"><span class="sub">মোট Dr (জমা)</span><b class="dr" id="kDr">0.00</b></div>
+  <div class="kpi"><span class="sub">মোট Cr (খরচ)</span><b class="cr" id="kCr">0.00</b></div>
+  <div class="kpi"><span class="sub">Cash Balance</span><b id="kBal">0.00</b></div>
+  <div class="kpi"><span class="sub">Entries</span><b id="kN">0</b></div>
+ </div>
+
+ <div class="card">
+  <form id="f">
+   <div><label>Date</label><input type="date" id="date" required></div>
+   <div><label>All Ledger</label><input id="ledger" list="ll" placeholder="Sales / Rent / Salary" required><datalist id="ll"></datalist></div>
+   <div style="grid-column:span 2"><label>Particular</label><input id="part" placeholder="বিবরণ" required></div>
+   <div><label>Country</label><input id="country" value="Bangladesh"></div>
+   <div><label>Cash Folio</label><input id="cf"></div>
+   <div><label>Ledger Folio</label><input id="lf"></div>
+   <div><label>Dr Taka</label><input type="number" step="0.01" min="0" id="dr" placeholder="0.00"></div>
+   <div><label>Cr Taka</label><input type="number" step="0.01" min="0" id="cr" placeholder="0.00"></div>
+   <div><button type="submit">+ Entry যোগ করো</button></div>
+  </form>
+ </div>
+
+ <div class="card">
+  <div class="tabs">
+   <button id="t1" class="on" onclick="tab(1)">Cash Book</button>
+   <button id="t2" onclick="tab(2)">Ledger Summary</button>
+   <span style="flex:1"></span>
+   <select id="yr" style="width:auto" onchange="render()"><option value="">All years</option><option>2025</option><option>2026</option></select>
+   <input id="q" placeholder="Search…" style="width:150px" oninput="render()">
+  </div>
+  <div class="sc"><table id="tb"></table></div>
+ </div>
+</div>
+
+<script>
+var KEY="rm_cashbook_v1",rows=[],view=1;
+try{rows=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){rows=[]}
+var $=function(i){return document.getElementById(i)};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(rows))}catch(e){}}
+function m(x){return Number(x).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function tab(v){view=v;$("t1").className=v==1?"on":"";$("t2").className=v==2?"on":"";render()}
+function del(id){if(confirm("এই entry মুছে ফেলবে?")){rows=rows.filter(function(r){return r.id!=id});save();render()}}
+$("date").value=new Date().toISOString().slice(0,10);
+$("f").onsubmit=function(e){
+ e.preventDefault();
+ var d=+$("dr").value||0,c=+$("cr").value||0;
+ if(!d&&!c){alert("Dr অথবা Cr amount দাও");return}
+ rows.push({id:Date.now()+Math.random(),date:$("date").value,ledger:$("ledger").value.trim(),part:$("part").value.trim(),country:$("country").value.trim(),cf:$("cf").value.trim(),lf:$("lf").value.trim(),dr:d,cr:c});
+ save();["part","cf","lf","dr","cr"].forEach(function(i){$(i).value=""});$("part").focus();render();
+};
+function render(){
+ var s=rows.slice().sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.id-b.id}),bal=0;
+ s.forEach(function(r){bal+=r.dr-r.cr;r.bal=bal});
+ var td=0,tc=0;s.forEach(function(r){td+=r.dr;tc+=r.cr});
+ $("kDr").textContent=m(td);$("kCr").textContent=m(tc);$("kBal").textContent=m(td-tc);$("kN").textContent=rows.length;
+ var L={};rows.forEach(function(r){L[r.ledger]=1});
+ $("ll").innerHTML=Object.keys(L).map(function(k){return'<option value="'+esc(k)+'">'}).join("");
+ var y=$("yr").value,q=$("q").value.toLowerCase();
+ var f=s.filter(function(r){return(!y||r.date.slice(0,4)==y)&&(!q||(r.ledger+" "+r.part+" "+r.country+" "+r.cf+" "+r.lf).toLowerCase().indexOf(q)>-1)});
+ var h="",a=0,b=0;
+ if(view==1){
+  h="<thead><tr><th>Date</th><th>All Ledger</th><th>Particular</th><th>Country</th><th>Cash Folio</th><th>Ledger Folio</th><th class=n>Dr Taka</th><th class=n>Cr Taka</th><th class=n>Balance</th><th></th></tr></thead><tbody>";
+  if(!f.length)h+='<tr><td colspan=10 class=empty>এখনো কোনো entry নেই</td></tr>';
+  f.forEach(function(r){a+=r.dr;b+=r.cr;
+   h+="<tr><td>"+esc(r.date)+"</td><td>"+esc(r.ledger)+"</td><td>"+esc(r.part)+"</td><td>"+esc(r.country)+"</td><td>"+esc(r.cf)+"</td><td>"+esc(r.lf)+"</td><td class='n dr'>"+(r.dr?m(r.dr):"")+"</td><td class='n cr'>"+(r.cr?m(r.cr):"")+"</td><td class=n>"+m(r.bal)+"</td><td><button class=x onclick='del(\""+r.id+"\")'>×</button></td></tr>"});
+  h+="</tbody><tfoot><tr><td colspan=6>Total ("+(y||"All")+")</td><td class=n>"+m(a)+"</td><td class=n>"+m(b)+"</td><td class=n>"+m(a-b)+"</td><td></td></tr></tfoot>";
+ }else{
+  var g={};f.forEach(function(r){var o=g[r.ledger]||(g[r.ledger]={d:0,c:0,n:0});o.d+=r.dr;o.c+=r.cr;o.n++});
+  h="<thead><tr><th>Ledger</th><th class=n>Entries</th><th class=n>Total Dr</th><th class=n>Total Cr</th><th class=n>Net (Dr − Cr)</th></tr></thead><tbody>";
+  var ks=Object.keys(g).sort();
+  if(!ks.length)h+='<tr><td colspan=5 class=empty>কোনো data নেই</td></tr>';
+  ks.forEach(function(k){var o=g[k];a+=o.d;b+=o.c;h+="<tr><td>"+esc(k)+"</td><td class=n>"+o.n+"</td><td class='n dr'>"+m(o.d)+"</td><td class='n cr'>"+m(o.c)+"</td><td class=n>"+m(o.d-o.c)+"</td></tr>"});
+  h+="</tbody><tfoot><tr><td colspan=2>Total</td><td class=n>"+m(a)+"</td><td class=n>"+m(b)+"</td><td class=n>"+m(a-b)+"</td></tr></tfoot>";
+ }
+ $("tb").innerHTML=h;
+}
+render();
+</script>
+</body>
+</html>
